@@ -14,22 +14,13 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index()
     {
-        //
+        $users=User::all();
+        return $users;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): Response
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
             $user=new User;
@@ -52,15 +43,17 @@ class UserController extends Controller
         if(Auth::attempt($credentials))
         {
 
+
+
                 $token=$request->user()->createToken('login_token')->plainTextToken;
 
-                return ["token"=>$token];
+                return ["succes"=>true,"token"=>$token,"user"=>["id"=>$request->user()->id,"user"=>$request->user()->name]];
 
 
         }
         else 
         {
-            return "some problem";
+            return ["success"=>false,"message"=>"wrong username or password"];
         }
 
     
@@ -68,35 +61,25 @@ class UserController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
-
-
-     public function justKidding()
-     {
-        return ["message"=>"token works"];
-     }
 
     public function show(string $id): Response
     {
-        //
+        $user=User::find($id);
+        return $user;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id): Response
+    
+    public function update(Request $request, string $id)
     {
-        //
-    }
+            $user=User::find($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id): RedirectResponse
-    {
-        //
+            $user->name=$request->name;
+            $user->email=$request->email;
+            $user->contact=$request->contact;
+            $user->password=Hash::make($request->password);
+            $user->save();
+
+            return ["success"=>true,"message"=>"User Updated"];
     }
 
     /**
